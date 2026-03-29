@@ -29,3 +29,6 @@ export * from "./uploadPhotoRequest";
 export * from "./uploadPhotoResponse";
 export * from "./vaccinationRecord";
 export * from "./verifyPetParams";
+export * from "./vetLoginRequest";
+export * from "./vetLoginResponse";
+export * from "./vetProfile";

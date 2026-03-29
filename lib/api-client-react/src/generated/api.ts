@@ -32,6 +32,9 @@ import type {
   UploadPhotoResponse,
   VaccinationRecord,
   VerifyPetParams,
+  VetLoginRequest,
+  VetLoginResponse,
+  VetProfile,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -1054,6 +1057,157 @@ export function useGetAdminStats<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetAdminStatsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Vet login
+ */
+export const getVetLoginUrl = () => {
+  return `/api/vet/login`;
+};
+
+export const vetLogin = async (
+  vetLoginRequest: VetLoginRequest,
+  options?: RequestInit,
+): Promise<VetLoginResponse> => {
+  return customFetch<VetLoginResponse>(getVetLoginUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(vetLoginRequest),
+  });
+};
+
+export const getVetLoginMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof vetLogin>>,
+    TError,
+    { data: BodyType<VetLoginRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof vetLogin>>,
+  TError,
+  { data: BodyType<VetLoginRequest> },
+  TContext
+> => {
+  const mutationKey = ["vetLogin"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof vetLogin>>,
+    { data: BodyType<VetLoginRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return vetLogin(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type VetLoginMutationResult = NonNullable<
+  Awaited<ReturnType<typeof vetLogin>>
+>;
+export type VetLoginMutationBody = BodyType<VetLoginRequest>;
+export type VetLoginMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Vet login
+ */
+export const useVetLogin = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof vetLogin>>,
+    TError,
+    { data: BodyType<VetLoginRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof vetLogin>>,
+  TError,
+  { data: BodyType<VetLoginRequest> },
+  TContext
+> => {
+  return useMutation(getVetLoginMutationOptions(options));
+};
+
+/**
+ * @summary Get current vet
+ */
+export const getGetVetMeUrl = () => {
+  return `/api/vet/me`;
+};
+
+export const getVetMe = async (options?: RequestInit): Promise<VetProfile> => {
+  return customFetch<VetProfile>(getGetVetMeUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetVetMeQueryKey = () => {
+  return [`/api/vet/me`] as const;
+};
+
+export const getGetVetMeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getVetMe>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getVetMe>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetVetMeQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getVetMe>>> = ({
+    signal,
+  }) => getVetMe({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getVetMe>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetVetMeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getVetMe>>
+>;
+export type GetVetMeQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get current vet
+ */
+
+export function useGetVetMe<
+  TData = Awaited<ReturnType<typeof getVetMe>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getVetMe>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetVetMeQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

@@ -145,6 +145,23 @@ export interface CreateMedicalRequest {
   notes: string;
 }
 
+export interface VetLoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface VetProfile {
+  id: string;
+  username: string;
+  name: string;
+  clinic?: string | null;
+}
+
+export interface VetLoginResponse {
+  token: string;
+  vet: VetProfile;
+}
+
 export interface UploadPhotoRequest {
   filename: string;
   dataUrl: string;

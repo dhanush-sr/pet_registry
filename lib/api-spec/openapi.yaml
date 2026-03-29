@@ -277,6 +277,50 @@ paths:
               schema:
                 $ref: "#/components/schemas/AdminStats"
 
+  /vet/login:
+    post:
+      operationId: vetLogin
+      tags: [auth]
+      summary: Vet login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VetLoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VetLoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /vet/me:
+    get:
+      operationId: getVetMe
+      tags: [auth]
+      summary: Get current vet
+      responses:
+        "200":
+          description: Current vet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VetProfile"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /upload:
     post:
       operationId: uploadPhoto
@@ -541,6 +585,45 @@ components:
           type: string
       required:
         - notes
+
+    VetLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    VetProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        name:
+          type: string
+        clinic:
+          type: string
+          nullable: true
+      required:
+        - id
+        - username
+        - name
+
+    VetLoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        vet:
+          $ref: "#/components/schemas/VetProfile"
+      required:
+        - token
+        - vet
 
     UploadPhotoRequest:
       type: object

@@ -341,6 +341,34 @@ export const GetAdminStatsResponse = zod.object({
 });
 
 /**
+ * @summary Vet login
+ */
+export const VetLoginBody = zod.object({
+  username: zod.string(),
+  password: zod.string(),
+});
+
+export const VetLoginResponse = zod.object({
+  token: zod.string(),
+  vet: zod.object({
+    id: zod.string(),
+    username: zod.string(),
+    name: zod.string(),
+    clinic: zod.string().nullish(),
+  }),
+});
+
+/**
+ * @summary Get current vet
+ */
+export const GetVetMeResponse = zod.object({
+  id: zod.string(),
+  username: zod.string(),
+  name: zod.string(),
+  clinic: zod.string().nullish(),
+});
+
+/**
  * @summary Upload a pet photo (returns URL)
  */
 export const UploadPhotoBody = zod.object({

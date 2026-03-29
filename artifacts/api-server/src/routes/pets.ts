@@ -12,6 +12,7 @@ import {
   AddMedicalRecordBody,
   UploadPhotoBody,
 } from "@workspace/api-zod";
+import { requireVet } from "../middlewares/requireVet";
 
 const router: IRouter = Router();
 
@@ -189,7 +190,7 @@ router.post("/pets", async (req, res) => {
   }
 });
 
-router.patch("/pets/:id", async (req, res) => {
+router.patch("/pets/:id", requireVet, async (req, res) => {
   try {
     const parsed = UpdatePetBody.safeParse(req.body);
     if (!parsed.success) {
@@ -217,7 +218,7 @@ router.patch("/pets/:id", async (req, res) => {
   }
 });
 
-router.patch("/pets/:id/verify", async (req, res) => {
+router.patch("/pets/:id/verify", requireVet, async (req, res) => {
   try {
     await db.update(petsTable).set({ status: "Verified" }).where(eq(petsTable.id, req.params.id));
     const result = await buildPetWithOwner(req.params.id);
@@ -245,7 +246,7 @@ router.get("/pets/:id/vaccinations", async (req, res) => {
   }
 });
 
-router.post("/pets/:id/vaccinations", async (req, res) => {
+router.post("/pets/:id/vaccinations", requireVet, async (req, res) => {
   try {
     const parsed = AddVaccinationBody.safeParse(req.body);
     if (!parsed.success) {
@@ -282,7 +283,7 @@ router.get("/pets/:id/medical", async (req, res) => {
   }
 });
 
-router.post("/pets/:id/medical", async (req, res) => {
+router.post("/pets/:id/medical", requireVet, async (req, res) => {
   try {
     const parsed = AddMedicalRecordBody.safeParse(req.body);
     if (!parsed.success) {
