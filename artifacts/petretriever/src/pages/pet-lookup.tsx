@@ -15,18 +15,20 @@ import {
   AlertCircle,
   CheckCircle2,
   Sparkles,
-  Clock,
 } from "lucide-react";
 
-export function VerifyPage() {
+export function PetLookupPage() {
   const [inputValue, setInputValue] = useState("");
   const [foundPet, setFoundPet] = useState<Pet | null>(null);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [verifiedIds, setVerifiedIds] = useState<Set<string>>(new Set());
+  const [justVerified, setJustVerified] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = inputValue.trim().toUpperCase();
+    setJustVerified(false);
     if (!trimmed) {
       setError("Please enter a Pet ID");
       setFoundPet(null);
@@ -46,7 +48,14 @@ export function VerifyPage() {
     }
   };
 
-  const isVerified = foundPet?.verified ?? false;
+  const handleVerify = () => {
+    if (foundPet) {
+      setVerifiedIds((prev) => new Set(prev).add(foundPet.id));
+      setJustVerified(true);
+    }
+  };
+
+  const isVerified = foundPet ? verifiedIds.has(foundPet.id) : false;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-14">
@@ -57,7 +66,8 @@ export function VerifyPage() {
           Pet Registry Lookup
         </div>
         <h1 className="text-4xl sm:text-5xl font-display font-bold tracking-tight text-foreground mb-4">
-          Verify Pet Identity
+          Find Your{" "}
+          <span className="text-gradient">Furry Friend</span>
         </h1>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto">
           Enter a Pet ID to view their full profile, vaccination history, and
@@ -216,17 +226,14 @@ export function VerifyPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200">
-                    <Clock className="w-6 h-6 text-amber-600" />
-                    <div>
-                      <p className="font-bold text-amber-800">
-                        Pending Verification
-                      </p>
-                      <p className="text-sm text-amber-600">
-                        Pending verification by Vet
-                      </p>
-                    </div>
-                  </div>
+                  <Button
+                    id="verify-button"
+                    onClick={handleVerify}
+                    className="w-full h-12 rounded-xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+                  >
+                    <ShieldCheck className="w-5 h-5 mr-2" />
+                    Verify Pet
+                  </Button>
                 )}
               </div>
 
@@ -315,7 +322,20 @@ export function VerifyPage() {
             </div>
           </div>
 
-
+          {/* Just Verified Toast */}
+          {justVerified && (
+            <div className="fixed bottom-6 right-6 animate-in slide-in-from-bottom-6 fade-in duration-500 z-50">
+              <div className="flex items-center gap-3 bg-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-600/30">
+                <CheckCircle2 className="w-6 h-6" />
+                <div>
+                  <p className="font-bold">Verification Successful!</p>
+                  <p className="text-sm text-emerald-100">
+                    {foundPet.name} is now verified.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -329,14 +349,8 @@ export function VerifyPage() {
             Enter a Pet ID above to get started
           </p>
           <p className="text-muted-foreground/60 text-sm mt-2">
-            Try{" "}
-            <span className="font-mono font-bold text-foreground/60">
-              DOG001
-            </span>{" "}
-            through{" "}
-            <span className="font-mono font-bold text-foreground/60">
-              DOG010
-            </span>
+            Try <span className="font-mono font-bold text-foreground/60">DOG001</span> through{" "}
+            <span className="font-mono font-bold text-foreground/60">DOG010</span>
           </p>
         </div>
       )}
