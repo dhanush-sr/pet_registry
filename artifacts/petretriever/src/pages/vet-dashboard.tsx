@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useListPets, useAddVaccination, useAddMedicalRecord, useMarkPetVerified, PetStatus } from "@workspace/api-client-react";
+import { useVetAuth } from "@/hooks/use-vet-auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
-import { Search, Plus, CheckCircle2, Syringe, ClipboardList, Loader2 } from "lucide-react";
+import { Search, Plus, CheckCircle2, Syringe, ClipboardList, Loader2, Stethoscope } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,9 +16,19 @@ export function VetDashboardPage() {
   const [search, setSearch] = useState("");
   const { data: petsData, isLoading, isError } = useListPets({ search });
   const pets = Array.isArray(petsData) ? petsData : [];
+  const { vet } = useVetAuth();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
+      {vet && (
+        <div className="flex items-center gap-3 mb-6 bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+          <Stethoscope className="w-5 h-5 text-primary shrink-0" />
+          <p className="text-sm text-foreground">
+            Signed in as <span className="font-semibold">{vet.name}</span>
+            {vet.clinic && <span className="text-muted-foreground"> · {vet.clinic}</span>}
+          </p>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10">
         <div>
           <h1 className="text-3xl font-display font-bold text-foreground">Veterinarian Dashboard</h1>
