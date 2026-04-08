@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { useVetAuth } from "@/hooks/use-vet-auth";
 
 export function VetDashboardPage() {
   const { logout } = useVetAuth();

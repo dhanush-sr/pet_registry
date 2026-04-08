@@ -1,0 +1,41 @@
+﻿node : [31merror when 
+starting dev server:
+At line:1 char:1
++ node node_modules/vit
+e/bin/vite.js 2>&1 | 
+Out-File -Encoding 
+utf8 vit ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : 
+NotSpecified: (    
+[31merror when starti  
+  ng dev 
+server::String    ) 
+[], RemoteException
+    + 
+FullyQualifiedError    
+Id : NativeCommandErr  
+  or
+ 
+Error: Port 5173 is 
+already in use
+    at 
+Server.onError$1 (file:
+///D:/petregistry/petre
+gistry/node_modules/.pn
+pm/vite@7.3.2_@types+no
+de@25.5_58b9eb6cbfd0903
+828a431e8f3033d19/node_
+modules/vite/dist/node/
+chunks/config.js:14933:
+28)
+    at Server.emit 
+(node:events:524:28)
+    at emitErrorNT 
+(node:net:1944:8)
+    at process.processT
+icksAndRejections (node
+:internal/process/task_
+queues:82:21)[39m

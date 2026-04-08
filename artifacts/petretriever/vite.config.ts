@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import fs from "fs";
+import { devMockApiPlugin } from "./src/dev-mock-api";
 
 // Custom Vite plugin to handle photo uploads during development
 function photoUploadPlugin() {
@@ -50,8 +51,9 @@ function photoUploadPlugin() {
   };
 }
 
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), photoUploadPlugin()],
+  plugins: [react(), tailwindcss(), photoUploadPlugin(), devMockApiPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
