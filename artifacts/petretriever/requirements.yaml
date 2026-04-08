@@ -10,7 +10,7 @@ packages:
 
 images:
   - path: "artifacts/petretriever/public/images/hero-pets.png"
-    description: "A high-quality, professional, brightly lit photo of a happy golden retriever and a calm tabby cat sitting together on a clean minimal background. Trustworthy and welcoming vibe."
+    description: "A high-quality, professional, brightly lit photo of a happy golden retriever sitting on a clean minimal background. Trustworthy and welcoming vibe."
     aspect_ratio: "16:9"
   - path: "artifacts/petretriever/public/images/logo-paw.png"
     description: "A minimal, modern, premium tech startup logo featuring a geometric paw print in bright primary blue on a transparent background."

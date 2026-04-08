@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,18 +19,10 @@ import { VetAuthProvider, useVetAuth } from "@/hooks/use-vet-auth";
 
 const queryClient = new QueryClient();
 
-function ProtectedVetRoute() {
+function ProtectedVetRoute({ component: Component }: { component: React.ElementType }) {
   const { isAuthenticated } = useVetAuth();
-  const [, navigate] = useLocation();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/vet/login");
-    }
-  }, [isAuthenticated, navigate]);
-
-  if (!isAuthenticated) return null;
-  return <VetDashboardPage />;
+  if (!isAuthenticated) return <Redirect to="/vet/login" replace />;
+  return <Component />;
 }
 
 function Router() {
@@ -43,7 +35,9 @@ function Router() {
         <Route path="/my-pets" component={MyPetsPage} />
         <Route path="/pet/:id" component={PetProfilePage} />
         <Route path="/vet/login" component={VetLoginPage} />
-        <Route path="/vet" component={ProtectedVetRoute} />
+        <Route path="/vet">
+          <ProtectedVetRoute component={VetDashboardPage} />
+        </Route>
         <Route path="/admin" component={AdminDashboardPage} />
         <Route component={NotFound} />
       </Switch>

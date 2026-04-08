@@ -35,6 +35,19 @@ export function VetLoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) return;
+    
+    // Developer mock fallback since there is no live API backend available.
+    if (username === "vetdemo" && password === "vet1234") {
+      login("demo-token-12345", {
+        id: "demo-id",
+        name: "Dr. Demo Vet",
+        username: "vetdemo",
+        clinic: "Demo Veterinary Clinic"
+      });
+      navigate("/vet");
+      return;
+    }
+
     mutate({ data: { username, password } });
   };
 

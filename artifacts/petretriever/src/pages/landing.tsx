@@ -66,7 +66,7 @@ export function LandingPage() {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-black/10 border border-white/50 aspect-square lg:aspect-[4/3] max-w-xl">
                 <img 
                   src={`${import.meta.env.BASE_URL}images/hero-pets.png`}
-                  alt="Happy Golden Retriever and Tabby Cat" 
+                  alt="Happy Golden Retriever" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />

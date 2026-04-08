@@ -11,10 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useVetAuth } from "@/hooks/use-vet-auth";
 
 export function VetDashboardPage() {
+  const { logout } = useVetAuth();
   const [search, setSearch] = useState("");
-  const { data: petsData, isLoading, isError } = useListPets({ search });
+  const { data: petsData, isLoading, isError } = useListPets(search ? { search } : undefined);
   const pets = Array.isArray(petsData) ? petsData : [];
   const { vet } = useVetAuth();
 
@@ -34,14 +36,19 @@ export function VetDashboardPage() {
           <h1 className="text-3xl font-display font-bold text-foreground">Veterinarian Dashboard</h1>
           <p className="text-muted-foreground mt-2">Manage pet health records and verify identities.</p>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search pets..." 
-            className="pl-9 bg-white"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+        <div className="flex w-full sm:w-auto items-center gap-3">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search pets..." 
+              className="pl-9 bg-white"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" onClick={() => logout()}>
+            Logout
+          </Button>
         </div>
       </div>
 

@@ -1,8 +1,10 @@
 import { Router, type IRouter } from "express";
+import fs from "fs/promises";
+import path from "path";
 import { db } from "@workspace/db";
 import { petsTable, ownersTable, vaccinationRecordsTable, medicalRecordsTable } from "@workspace/db";
 import { eq, ilike, or, and, sql } from "drizzle-orm";
-import { nanoid } from "nanoid";
+
 import {
   CreatePetBody,
   UpdatePetBody,
@@ -16,8 +18,24 @@ import { requireVet } from "../middlewares/requireVet";
 
 const router: IRouter = Router();
 
-function generatePetId(): string {
-  return "PR-" + nanoid(8).toUpperCase();
+async function generatePetId(): Promise<string> {
+  const MIN_START = 11; // Start from DOG011 since DOG001-DOG010 exist
+  const rows = await db
+    .select({ petId: petsTable.petId })
+    .from(petsTable)
+    .where(sql`${petsTable.petId} LIKE 'DOG%'`);
+
+  let maxNum = MIN_START - 1;
+  for (const row of rows) {
+    const match = row.petId.match(/^DOG(\d+)$/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  }
+
+  const nextNum = maxNum + 1;
+  return `DOG${String(nextNum).padStart(3, "0")}`;
 }
 
 async function buildPetWithOwner(petId: string) {
@@ -164,7 +182,7 @@ router.post("/pets", async (req, res) => {
       owner = inserted[0];
     }
 
-    const petId = generatePetId();
+    const petId = await generatePetId();
     const inserted = await db
       .insert(petsTable)
       .values({
@@ -343,7 +361,36 @@ router.post("/upload", async (req, res) => {
       res.status(400).json({ error: parsed.error.message });
       return;
     }
-    const url = parsed.data.dataUrl;
+
+    const { dataUrl, filename } = parsed.data;
+    
+    // Extract base64 data
+    const matches = dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      res.status(400).json({ error: "Invalid data URL" });
+      return;
+    }
+
+    const type = matches[1];
+    const buffer = Buffer.from(matches[2], "base64");
+    
+    // Determine extension or use original filename
+    const ext = path.extname(filename) || ".png";
+    const nameOnly = path.basename(filename, ext);
+    const safeFilename = `${nameOnly}_${Date.now()}${ext}`;
+    
+    // Resolve absolute path to artifacts/petretriever/public/images/dogs
+    // Assumes server is running in artifacts/api-server
+    const targetDir = path.resolve(process.cwd(), "..", "petretriever", "public", "images", "dogs");
+    
+    // Ensure directory exists
+    await fs.mkdir(targetDir, { recursive: true });
+    
+    const filePath = path.join(targetDir, safeFilename);
+    await fs.writeFile(filePath, buffer);
+
+    // Return the URL relative to the frontend's public folder
+    const url = `/images/dogs/${safeFilename}`;
     res.json({ url });
   } catch (err) {
     req.log.error({ err }, "Failed to upload photo");

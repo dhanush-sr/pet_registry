@@ -21,7 +21,6 @@ const registerSchema = z.object({
   breed: z.string().min(1, "Breed required"),
   age: z.coerce.number().min(0, "Age must be 0 or greater"),
   gender: z.enum(["Male", "Female", "Unknown"]),
-  rhinariumId: z.string().optional().or(z.literal("")),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -67,10 +66,12 @@ export function RegisterPage() {
       }
 
       // Create pet
+      const autoRhinariumId = `RH-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
       const pet = await createPetMutation.mutateAsync({
         data: {
           ...data,
           gender: data.gender as CreatePetRequestGender,
+          rhinariumId: autoRhinariumId,
           photoUrl: uploadedUrl,
         }
       });
@@ -96,7 +97,7 @@ export function RegisterPage() {
     if (step === 1) {
       valid = await form.trigger(["ownerName", "ownerPhone", "ownerEmail"]);
     } else if (step === 2) {
-      valid = await form.trigger(["name", "species", "breed", "age", "gender", "rhinariumId"]);
+      valid = await form.trigger(["name", "species", "breed", "age", "gender"]);
     }
     
     if (valid) {
@@ -192,7 +193,7 @@ export function RegisterPage() {
                 </div>
                 <div>
                   <Label>Species</Label>
-                  <Input {...form.register("species")} placeholder="Dog, Cat, etc." className="mt-1" />
+                  <Input {...form.register("species")} placeholder="Dog, Bird, etc." className="mt-1" />
                   {form.formState.errors.species && <p className="text-sm text-destructive mt-1">{form.formState.errors.species.message}</p>}
                 </div>
               </div>
@@ -222,11 +223,6 @@ export function RegisterPage() {
                     </Select>
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <Label>Rhinarium / Nose Print ID (Optional)</Label>
-                <Input {...form.register("rhinariumId")} placeholder="e.g. RH-2024-A9X3" className="mt-1" />
               </div>
             </div>
 

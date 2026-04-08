@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { pets, Pet } from "@/data/pets";
+import { useVerifyPet, useMarkPetVerified } from "@workspace/api-client-react";
+import type { PetProfile } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,47 +16,53 @@ import {
   AlertCircle,
   CheckCircle2,
   Sparkles,
+  Loader2,
+  Clock,
 } from "lucide-react";
 
 export function PetLookupPage() {
   const [inputValue, setInputValue] = useState("");
-  const [foundPet, setFoundPet] = useState<Pet | null>(null);
-  const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-  const [verifiedIds, setVerifiedIds] = useState<Set<string>>(new Set());
+  const [searchParams, setSearchParams] = useState<{ petId?: string } | undefined>(undefined);
   const [justVerified, setJustVerified] = useState(false);
+
+  const { data: searchResults, isLoading, isError, error: apiError, refetch } = useVerifyPet(searchParams, {
+    query: {
+      enabled: hasSearched && !!searchParams?.petId,
+    }
+  } as any);
+
+  const verifyMutation = useMarkPetVerified();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = inputValue.trim().toUpperCase();
     setJustVerified(false);
     if (!trimmed) {
-      setError("Please enter a Pet ID");
-      setFoundPet(null);
       setHasSearched(false);
       return;
     }
 
-    const pet = pets.find((p) => p.id === trimmed);
+    setSearchParams({ petId: trimmed });
     setHasSearched(true);
-
-    if (pet) {
-      setFoundPet(pet);
-      setError("");
-    } else {
-      setFoundPet(null);
-      setError(`No pet found with ID "${trimmed}"`);
-    }
   };
 
-  const handleVerify = () => {
+  const foundPet = Array.isArray(searchResults) && searchResults.length > 0 ? searchResults[0] : null;
+  const error = apiError ? (apiError as any).data?.error || "An error occurred" : (!isLoading && hasSearched && searchParams && !foundPet) ? `No pet found with ID "${searchParams?.petId}"` : "";
+
+  const handleVerify = async () => {
     if (foundPet) {
-      setVerifiedIds((prev) => new Set(prev).add(foundPet.id));
-      setJustVerified(true);
+      try {
+        await verifyMutation.mutateAsync({ id: foundPet.id });
+        setJustVerified(true);
+        refetch(); // Refresh pet data to show verified status
+      } catch (err) {
+        console.error("Failed to verify pet", err);
+      }
     }
   };
 
-  const isVerified = foundPet ? verifiedIds.has(foundPet.id) : false;
+  const isVerified = foundPet?.status === "Verified";
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-14">
@@ -87,7 +94,7 @@ export function PetLookupPage() {
               id="pet-id-input"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Enter Pet ID (e.g. DOG001)"
+              placeholder="Enter Pet ID (e.g. DOG011)"
               className="pl-12 h-14 text-lg rounded-xl bg-white border-2 focus-visible:ring-0 focus-visible:border-primary uppercase font-mono tracking-wider"
             />
           </div>
@@ -95,10 +102,15 @@ export function PetLookupPage() {
             id="search-button"
             type="submit"
             size="lg"
+            disabled={isLoading}
             className="h-14 px-8 rounded-xl text-base font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
           >
-            <Search className="w-5 h-5 mr-2" />
-            Search
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+              <Search className="w-5 h-5 mr-2" />
+            )}
+            {isLoading ? "Searching..." : "Search"}
           </Button>
         </form>
       </div>
@@ -136,7 +148,7 @@ export function PetLookupPage() {
             {/* Image */}
             <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-3xl border-4 border-white shadow-2xl overflow-hidden shrink-0 bg-muted relative z-10 group">
               <img
-                src={foundPet.image}
+                src={foundPet.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1"}
                 alt={foundPet.name}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
@@ -182,7 +194,7 @@ export function PetLookupPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Pet ID</p>
                   <p className="font-mono font-bold text-lg bg-muted/50 px-3 py-1 rounded-lg inline-block">
-                    {foundPet.id}
+                    {foundPet.petId}
                   </p>
                 </div>
                 <div>
@@ -193,11 +205,11 @@ export function PetLookupPage() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">
-                    Last Checkup
+                    Registration Date
                   </p>
                   <p className="font-semibold text-base flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-primary" />
-                    {formatDate(foundPet.lastCheckupDate)}
+                    {formatDate(foundPet.createdAt)}
                   </p>
                 </div>
               </div>
@@ -229,10 +241,15 @@ export function PetLookupPage() {
                   <Button
                     id="verify-button"
                     onClick={handleVerify}
+                    disabled={verifyMutation.isPending}
                     className="w-full h-12 rounded-xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
                   >
-                    <ShieldCheck className="w-5 h-5 mr-2" />
-                    Verify Pet
+                    {verifyMutation.isPending ? (
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="w-5 h-5 mr-2" />
+                    )}
+                    {verifyMutation.isPending ? "Verifying..." : "Verify Pet"}
                   </Button>
                 )}
               </div>
@@ -282,7 +299,7 @@ export function PetLookupPage() {
                   <Syringe className="w-6 h-6 text-primary" />
                   Vaccination Records
                 </h3>
-                {foundPet.vaccinations.length === 0 ? (
+                {!foundPet.vaccinations || foundPet.vaccinations.length === 0 ? (
                   <p className="text-muted-foreground py-4 text-center">
                     No vaccination records found.
                   </p>
@@ -290,7 +307,7 @@ export function PetLookupPage() {
                   <div className="space-y-3">
                     {foundPet.vaccinations.map((vax, index) => (
                       <div
-                        key={vax}
+                        key={vax.id}
                         className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-slate-50/50 hover:bg-slate-100/80 transition-colors group"
                         style={{
                           animationDelay: `${index * 80}ms`,
@@ -301,18 +318,27 @@ export function PetLookupPage() {
                             <Syringe className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="font-bold text-foreground">{vax}</p>
+                            <p className="font-bold text-foreground">{vax.type}</p>
                             <p className="text-xs text-muted-foreground">
-                              Administered
+                              Administered on {formatDate(vax.date)}
                             </p>
                           </div>
                         </div>
                         <Badge
                           variant="outline"
-                          className="bg-green-50 text-green-700 border-green-200"
+                          className={vax.verified ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"}
                         >
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          Complete
+                          {vax.verified ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              Verified
+                            </>
+                          ) : (
+                            <>
+                              <Clock className="w-3 h-3 mr-1" />
+                              Pending
+                            </>
+                          )}
                         </Badge>
                       </div>
                     ))}
@@ -349,8 +375,7 @@ export function PetLookupPage() {
             Enter a Pet ID above to get started
           </p>
           <p className="text-muted-foreground/60 text-sm mt-2">
-            Try <span className="font-mono font-bold text-foreground/60">DOG001</span> through{" "}
-            <span className="font-mono font-bold text-foreground/60">DOG010</span>
+            Try <span className="font-mono font-bold text-foreground/60">DOG011</span>
           </p>
         </div>
       )}
