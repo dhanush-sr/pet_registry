@@ -18,8 +18,8 @@ interface VetAuthContextType {
 
 const VetAuthContext = createContext<VetAuthContextType | null>(null);
 
-const TOKEN_KEY = "petretriever_vet_token";
-const VET_KEY = "petretriever_vet_user";
+const TOKEN_KEY = "petregistry_vet_token";
+const VET_KEY = "petregistry_vet_user";
 
 export function VetAuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));

@@ -29,7 +29,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <PawPrint className="w-6 h-6 text-primary" />
               </div>
               <span className="font-display font-bold text-2xl tracking-tight text-foreground group-hover:text-primary transition-colors">
-                PetRetriever
+                PetRegistry
               </span>
             </Link>
 
@@ -128,10 +128,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2 opacity-80">
             <PawPrint className="w-5 h-5 text-primary" />
-            <span className="font-display font-bold text-lg">PetRetriever</span>
+            <span className="font-display font-bold text-lg">PetRegistry</span>
           </div>
           <p className="text-sm text-muted-foreground text-center md:text-left">
-            &copy; {new Date().getFullYear()} PetRetriever Identity Platform. All rights reserved.
+            &copy; {new Date().getFullYear()} PetRegistry Identity Platform. All rights reserved.
           </p>
         </div>
       </footer>

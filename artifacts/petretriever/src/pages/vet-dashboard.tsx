@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useListPets, useAddVaccination, useAddMedicalRecord, useMarkPetVerified, PetStatus } from "@workspace/api-client-react";
+import { useListPets, useAddVaccination, useAddMedicalRecord, useMarkPetVerified, PetStatus, useGetPetVaccinations, useGetPetMedicalRecords } from "@workspace/api-client-react";
 import { useVetAuth } from "@/hooks/use-vet-auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { Search, Plus, CheckCircle2, Syringe, ClipboardList, Loader2, Stethoscope } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -64,16 +65,21 @@ export function VetDashboardPage() {
           <div className="divide-y divide-border">
             {pets.map(pet => (
               <div key={pet.id} className="p-4 sm:p-6 flex flex-col md:flex-row gap-6 items-start md:items-center hover:bg-slate-50 transition-colors">
-                <div className="flex-1 flex gap-4 items-center">
-                  <div className="w-16 h-16 rounded-full bg-muted overflow-hidden shrink-0 border-2 border-white shadow-sm">
-                    {pet.photoUrl && <img src={pet.photoUrl} alt="" className="w-full h-full object-cover" />}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{pet.name}</h3>
-                    <p className="text-sm text-muted-foreground">{pet.species} • {pet.owner?.name}</p>
-                    <p className="text-xs font-mono mt-1 text-muted-foreground">ID: {pet.petId}</p>
-                  </div>
-                </div>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button className="flex-1 flex gap-4 items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl transition-colors">
+                      <div className="w-16 h-16 rounded-full bg-muted overflow-hidden shrink-0 border-2 border-white shadow-sm">
+                        {pet.photoUrl && <img src={pet.photoUrl} alt="" className="w-full h-full object-cover" />}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg hover:underline cursor-pointer">{pet.name}</h3>
+                        <p className="text-sm text-muted-foreground">{pet.species} • {pet.owner?.name}</p>
+                        <p className="text-xs font-mono mt-1 text-muted-foreground">ID: {pet.petId}</p>
+                      </div>
+                    </button>
+                  </SheetTrigger>
+                  <PetProfileSheetContent petId={pet.id} petName={pet.name} />
+                </Sheet>
                 
                 <div className="w-full md:w-auto flex flex-wrap items-center gap-3">
                   <StatusBadge status={pet.status} />
@@ -240,5 +246,98 @@ function VerifyPetButton({ petId }: { petId: string }) {
     >
       <CheckCircle2 className="w-4 h-4 mr-2" /> Verify
     </Button>
+  );
+}
+
+function PetProfileSheetContent({ petId, petName }: { petId: string, petName: string }) {
+  const { data: vaccinations, isLoading: loadingVax, isError: errorVax } = useGetPetVaccinations(petId);
+  const { data: medicalRecords, isLoading: loadingMed, isError: errorMed } = useGetPetMedicalRecords(petId);
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "Invalid Date";
+      return d.toLocaleDateString();
+    } catch {
+      return "Unknown Date";
+    }
+  };
+
+  return (
+    <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+      <SheetHeader className="mb-6">
+        <SheetTitle>{petName}'s Medical History</SheetTitle>
+        <SheetDescription>View vaccination records and clinical notes.</SheetDescription>
+      </SheetHeader>
+
+      <div className="space-y-8">
+        <div>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Syringe className="w-5 h-5 text-primary" />
+            Vaccinations
+          </h3>
+          {loadingVax ? (
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin"/> Loading...
+            </p>
+          ) : errorVax ? (
+            <p className="text-sm text-destructive italic">Unable to load vaccination records.</p>
+          ) : vaccinations?.length ? (
+            <div className="space-y-4">
+              {vaccinations.map(v => (
+                <div key={v.id} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="font-medium text-slate-900">{v.type}</p>
+                    <span className="text-xs text-muted-foreground bg-white px-2 py-1 rounded-md border border-slate-200">
+                      {v.date ? formatDate(v.date) : "No date"}
+                    </span>
+                  </div>
+                  {v.notes && <p className="text-sm text-muted-foreground mt-2">{v.notes}</p>}
+                  <div className="mt-3 flex items-center gap-1 text-xs font-medium">
+                    {v.verified ? (
+                      <span className="text-green-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Vet Verified</span>
+                    ) : (
+                      <span className="text-yellow-600">Self-reported</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No vaccinations recorded.</p>
+          )}
+        </div>
+
+        <div>
+           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-primary" />
+            Medical Notes
+          </h3>
+          {loadingMed ? (
+             <p className="text-sm text-muted-foreground flex items-center gap-2">
+               <Loader2 className="w-4 h-4 animate-spin"/> Loading...
+             </p>
+          ) : errorMed ? (
+            <p className="text-sm text-destructive italic">Unable to load medical records.</p>
+          ) : medicalRecords?.length ? (
+            <div className="space-y-4">
+               {medicalRecords.map(m => (
+                 <div key={m.id} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-xs font-medium text-slate-500">Note</span>
+                      <span className="text-xs text-muted-foreground bg-white px-2 py-1 rounded-md border border-slate-200">
+                        {m.createdAt ? formatDate(m.createdAt) : "No date"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{m.notes}</p>
+                 </div>
+               ))}
+            </div>
+          ) : (
+             <p className="text-sm text-muted-foreground italic">No medical records found.</p>
+          )}
+        </div>
+      </div>
+    </SheetContent>
   );
 }

@@ -120,6 +120,26 @@ export function devMockApiPlugin() {
               }
             }
 
+            // GET /api/pets/:id/vaccinations
+            if (method === "GET" && urlStr.match(/^\/pets\/[^/]+\/vaccinations/)) {
+              const id = urlStr.split("/")[2];
+              const db = readDB();
+              if (db[id]) {
+                return sendJson(200, db[id].vaccinations || []);
+              }
+              return sendJson(404, { error: "Not found" });
+            }
+
+            // GET /api/pets/:id/medical
+            if (method === "GET" && urlStr.match(/^\/pets\/[^/]+\/medical/)) {
+              const id = urlStr.split("/")[2];
+              const db = readDB();
+              if (db[id]) {
+                return sendJson(200, db[id].medicalRecords || []);
+              }
+              return sendJson(404, { error: "Not found" });
+            }
+
             // PATCH /api/pets/:id/verify
             if (method === "PATCH" && urlStr.match(/^\/pets\/[^/]+\/verify/)) {
               const id = urlStr.split("/")[2];

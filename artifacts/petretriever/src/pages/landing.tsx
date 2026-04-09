@@ -10,9 +10,9 @@ export function LandingPage() {
       <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-            
+
             {/* Left Content */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -26,9 +26,9 @@ export function LandingPage() {
                 Protect your best friend with <span className="text-gradient">verified identity.</span>
               </h1>
               <p className="text-lg lg:text-xl text-muted-foreground mb-8 leading-relaxed">
-                PetRetriever creates a secure, vet-verified digital passport for your pet. Instantly access vaccination records, medical history, and ownership proof anywhere, anytime.
+                PetRegistry creates a secure, vet-verified digital passport for your pet. Instantly access vaccination records, medical history, and ownership proof anywhere, anytime.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/register">
                   <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-1 transition-all">
@@ -42,7 +42,7 @@ export function LandingPage() {
                   </Button>
                 </Link>
               </div>
-              
+
               <div className="mt-10 flex items-center gap-6 text-sm font-medium text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckIcon /> Trusted by Vets
@@ -57,20 +57,20 @@ export function LandingPage() {
             </motion.div>
 
             {/* Right Image */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative lg:ml-auto"
             >
               <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-black/10 border border-white/50 aspect-square lg:aspect-[4/3] max-w-xl">
-                <img 
+                <img
                   src={`${import.meta.env.BASE_URL}images/hero-pets.png`}
-                  alt="Happy Golden Retriever" 
+                  alt="Happy Golden Retriever"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-transparent" />
-                
+
                 {/* Floating Badge */}
                 <div className="absolute bottom-6 left-6 glass-panel rounded-2xl p-4 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
                   <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -97,19 +97,19 @@ export function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard 
+            <FeatureCard
               icon={Camera}
               step="01"
               title="Register & Profile"
               desc="Create an account with your pet's photo, breed, and your contact information."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={Stethoscope}
               step="02"
               title="Vet Verification"
               desc="Your veterinarian logs in to confirm medical records and issue a Verified badge."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={Search}
               step="03"
               title="Instant Lookup"

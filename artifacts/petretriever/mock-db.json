@@ -8,7 +8,7 @@
     "age": 3,
     "gender": "Male",
     "photoUrl": "/images/dogs/dogo1.jpeg",
-    "status": "Pending",
+    "status": "Verified",
     "createdAt": "2025-11-15T00:00:00.000Z",
     "rhinariumId": "RH-2025-BDY1",
     "owner": {
@@ -43,7 +43,14 @@
         "notes": null
       }
     ],
-    "medicalRecords": []
+    "medicalRecords": [
+      {
+        "id": "med-1775707441693",
+        "petId": "demo-001",
+        "createdAt": "2026-04-09T04:04:01.693Z",
+        "notes": "he is doing fine\n"
+      }
+    ]
   },
   "demo-002": {
     "id": "demo-002",
@@ -54,7 +61,7 @@
     "age": 5,
     "gender": "Male",
     "photoUrl": "/images/dogs/dogo2.jpeg",
-    "status": "Pending",
+    "status": "Verified",
     "createdAt": "2025-09-22T00:00:00.000Z",
     "rhinariumId": "RH-2025-MAX2",
     "owner": {
@@ -89,7 +96,14 @@
         "notes": null
       }
     ],
-    "medicalRecords": []
+    "medicalRecords": [
+      {
+        "id": "med-1775667639195",
+        "petId": "demo-002",
+        "createdAt": "2026-04-08T17:00:39.196Z",
+        "notes": "para"
+      }
+    ]
   },
   "demo-003": {
     "id": "demo-003",
@@ -200,7 +214,7 @@
     "age": 1,
     "gender": "Female",
     "photoUrl": "/images/dogs/dogo5.jpeg",
-    "status": "Pending",
+    "status": "Verified",
     "createdAt": "2026-02-14T00:00:00.000Z",
     "rhinariumId": "RH-2026-LNA5",
     "owner": {
@@ -518,6 +532,78 @@
       "id": "owner-mock-1775654284088",
       "name": "Raj",
       "phone": "8867763556",
+      "email": ""
+    },
+    "vaccinations": [],
+    "medicalRecords": []
+  },
+  "mock-1775667373476": {
+    "ownerName": "ashwin",
+    "ownerPhone": "6739256476",
+    "ownerEmail": "",
+    "name": "valhalla",
+    "species": "Dog",
+    "breed": "Black",
+    "age": 4,
+    "gender": "Male",
+    "rhinariumId": "RH-2026-DZ0U",
+    "photoUrl": "/images/dogs/victor-g-N04FIfHhv_k-unsplash (1)_1775667373463.jpg",
+    "id": "mock-1775667373476",
+    "petId": "DOG013",
+    "status": "Pending",
+    "createdAt": "2026-04-08T16:56:13.476Z",
+    "owner": {
+      "id": "owner-mock-1775667373476",
+      "name": "ashwin",
+      "phone": "6739256476",
+      "email": ""
+    },
+    "vaccinations": [],
+    "medicalRecords": []
+  },
+  "mock-1775707382168": {
+    "ownerName": "Aamer Khan",
+    "ownerPhone": "9391951408",
+    "ownerEmail": "aamerkhanrz@gmail.com",
+    "name": "Pista",
+    "species": "Dog",
+    "breed": "Black",
+    "age": 5,
+    "gender": "Male",
+    "rhinariumId": "RH-2026-RU51",
+    "photoUrl": "/images/dogs/pexels-sandeep-kumar-1891325-19927175_1775707382157.jpg",
+    "id": "mock-1775707382168",
+    "petId": "DOG014",
+    "status": "Pending",
+    "createdAt": "2026-04-09T04:03:02.168Z",
+    "owner": {
+      "id": "owner-mock-1775707382168",
+      "name": "Aamer Khan",
+      "phone": "9391951408",
+      "email": "aamerkhanrz@gmail.com"
+    },
+    "vaccinations": [],
+    "medicalRecords": []
+  },
+  "mock-1775707838598": {
+    "ownerName": "Vivek",
+    "ownerPhone": "9100661876",
+    "ownerEmail": "",
+    "name": "Cezer",
+    "species": "Dog",
+    "breed": "Lab ",
+    "age": 6,
+    "gender": "Male",
+    "rhinariumId": "RH-2026-SF6H",
+    "photoUrl": "/images/dogs/cezer _1775707838576.jpeg",
+    "id": "mock-1775707838598",
+    "petId": "DOG015",
+    "status": "Verified",
+    "createdAt": "2026-04-09T04:10:38.599Z",
+    "owner": {
+      "id": "owner-mock-1775707838598",
+      "name": "Vivek",
+      "phone": "9100661876",
       "email": ""
     },
     "vaccinations": [],
