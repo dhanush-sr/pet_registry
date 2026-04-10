@@ -1,14 +1,14 @@
 {
   "builds": [
     {
-      "src": "dist/index.mjs",
+      "src": "artifacts/api-server/dist/index.mjs",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/index.mjs"
+      "dest": "artifacts/api-server/dist/index.mjs"
     }
   ]
 }
