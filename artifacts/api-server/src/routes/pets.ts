@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import fs from "fs/promises";
+import { put } from "@vercel/blob";
 import path from "path";
 import { db } from "@workspace/db";
 import { petsTable, ownersTable, vaccinationRecordsTable, medicalRecordsTable } from "@workspace/db";
@@ -379,18 +379,12 @@ router.post("/upload", async (req, res) => {
     const nameOnly = path.basename(filename, ext);
     const safeFilename = `${nameOnly}_${Date.now()}${ext}`;
     
-    // Resolve absolute path to artifacts/petretriever/public/images/dogs
-    // Assumes server is running in artifacts/api-server
-    const targetDir = path.resolve(process.cwd(), "..", "petretriever", "public", "images", "dogs");
-    
-    // Ensure directory exists
-    await fs.mkdir(targetDir, { recursive: true });
-    
-    const filePath = path.join(targetDir, safeFilename);
-    await fs.writeFile(filePath, buffer);
+    // Upload to Vercel Blob
+    const { url } = await put(safeFilename, buffer, {
+      access: "public",
+      contentType: type,
+    });
 
-    // Return the URL relative to the frontend's public folder
-    const url = `/images/dogs/${safeFilename}`;
     res.json({ url });
   } catch (err) {
     req.log.error({ err }, "Failed to upload photo");
